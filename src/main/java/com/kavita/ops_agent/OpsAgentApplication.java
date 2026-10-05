@@ -10,4 +10,5 @@ public class OpsAgentApplication {
 		SpringApplication.run(OpsAgentApplication.class, args);
 	}
 
+
 }
