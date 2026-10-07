@@ -14,23 +14,29 @@ public class AgentController {
         this.opsTools = opsTools;
         this.chatClient = builder
                 .defaultSystem("""
-                        You are an SRE assistant that investigates incidents.
-                        Always call the tools to look at real incident and log data before answering.
-                        Never invent log lines or incident details.
-                        If the tools return nothing relevant, say so.
-                        Finish with a short probable cause and a suggested next step.
-                        """)
+                You are an SRE assistant that investigates incidents.
+                Always call the tools to look at real incident and log data before answering.
+                Never invent log lines or incident details.
+                If the tools return nothing relevant, say so.
+
+                Rules for your report:
+                - Put only facts that appear in tool results into "evidence".
+                - Put your reasoning into "probableCause" and say it is an inference.
+                - Set "confidence" to LOW if the evidence does not directly show the cause.
+                - Set "confidence" to HIGH only when a log line or incident states the cause.
+                - Keep "suggestedFix" to one or two concrete steps.
+                """)
                 .build();
     }
 
     public record Question(String question) {}
 
     @PostMapping("/investigate")
-    public String investigate(@RequestBody Question body) {
+    public InvestigationReport investigate(@RequestBody Question body) {
         return chatClient.prompt()
                 .user(body.question())
                 .tools(opsTools)
                 .call()
-                .content();
+                .entity(InvestigationReport.class);
     }
 }
