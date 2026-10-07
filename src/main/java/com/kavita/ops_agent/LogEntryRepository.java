@@ -5,4 +5,7 @@ import java.util.List;
 
 public interface LogEntryRepository extends JpaRepository<LogEntry, Long> {
     List<LogEntry> findTop10ByMessageContainingIgnoreCaseOrderByTimestampDesc(String keyword);
+
+    List<LogEntry> findTop10ByServiceContainingIgnoreCaseOrMessageContainingIgnoreCaseOrderByTimestampDesc(
+            String service, String message);
 }
